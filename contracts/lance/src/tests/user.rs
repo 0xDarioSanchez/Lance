@@ -1,16 +1,84 @@
 #![cfg(test)]
 
-use crate::{
-    storage::service_status::ServiceStatus,
-    tests::config::{constants::BASE_MINT_AMOUNT, contract::ContractTest},
-};
+use crate::tests::config::contract::ContractTest;
 
-use soroban_sdk::{
-    testutils::{Address as _, Ledger as _, MockAuth, MockAuthInvoke},
-    token, Address, Env, String,
-};
+use soroban_sdk::{testutils::Address as _, Address, String};
 
-use crate::contract::{Contract, ContractClient};
+#[test]
+fn test_create_employee_user() {
+    let ContractTest {
+        env,
+        contract,
+        employee_1,
+        ..
+    } = ContractTest::setup();
+
+    env.mock_all_auths();
+
+    contract.new_user(&employee_1, &true, &false, &false, &None);
+
+    let user_data = contract.get_user(&employee_1);
+
+    assert_eq!(user_data.address, employee_1);
+    assert!(user_data.is_employee);
+    assert!(!user_data.is_employer);
+    assert!(!user_data.is_judge);
+    assert!(user_data.personal_data.is_none());
+}
+
+#[test]
+fn test_create_employer_user() {
+    let ContractTest { env, contract, .. } = ContractTest::setup();
+
+    env.mock_all_auths();
+
+    let employer = Address::generate(&env);
+    contract.new_user(&employer, &false, &true, &false, &None);
+
+    let user_data = contract.get_user(&employer);
+
+    assert_eq!(user_data.address, employer);
+    assert!(!user_data.is_employee);
+    assert!(user_data.is_employer);
+    assert!(!user_data.is_judge);
+    assert!(user_data.personal_data.is_none());
+}
+
+#[test]
+fn test_create_user_with_personal_data() {
+    let ContractTest { env, contract, .. } = ContractTest::setup();
+
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    let personal_data = String::from_str(&env, "Employee 1");
+
+    contract.new_user(&user, &true, &false, &false, &Some(personal_data.clone()));
+
+    let user_data = contract.get_user(&user);
+    assert_eq!(user_data.personal_data, Some(personal_data));
+}
+
+#[test]
+fn test_multiple_users_are_independent() {
+    let ContractTest { env, contract, .. } = ContractTest::setup();
+
+    env.mock_all_auths();
+
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    contract.new_user(&user1, &true, &false, &false, &None);
+    contract.new_user(&user2, &false, &true, &false, &None);
+
+    let data1 = contract.get_user(&user1);
+    let data2 = contract.get_user(&user2);
+
+    assert_ne!(data1.address, data2.address);
+    assert!(data1.is_employee && !data2.is_employee);
+    assert!(data2.is_employer && !data1.is_employer);
+}
+
 #[test]
 fn test_add_and_get_user() {
     let ContractTest {
@@ -19,6 +87,8 @@ fn test_add_and_get_user() {
         employee_1,
         ..
     } = ContractTest::setup();
+
+    env.mock_all_auths();
 
     let personal_data = String::from_str(&env, "Employee 1");
     contract.new_user(

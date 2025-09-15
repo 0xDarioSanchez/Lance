@@ -1,7 +1,6 @@
 #![cfg(test)]
 
 use crate::tests::config::{constants::BASE_MINT_AMOUNT, contract::ContractTest};
-use soroban_sdk::String;
 
 #[test]
 fn test_approve_milestone() {

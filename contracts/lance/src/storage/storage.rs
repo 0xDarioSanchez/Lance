@@ -8,4 +8,5 @@ pub enum DataKey {
     Users(Address),
     Services(u32),
     Disputes(u32),
+    Balances(Address),
 }

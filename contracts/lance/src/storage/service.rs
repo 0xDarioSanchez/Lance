@@ -29,3 +29,8 @@ pub(crate) fn get_service(env: &Env, service_id: u32) -> Result<Service, Error> 
         .get(&key)
         .ok_or(Error::ServiceNotFound)
 }
+
+pub(crate) fn remove_service(env: &Env, service_id: u32) {
+    let key = DataKey::Services(service_id);
+    env.storage().instance().remove(&key);  
+}

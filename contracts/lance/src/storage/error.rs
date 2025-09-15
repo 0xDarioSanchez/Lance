@@ -12,4 +12,5 @@ pub enum Error {
     DisputeNotFound = 5,
     InsufficientTime = 6,
     InvalidDuration = 7,
+    BalanceIsZero = 8,
 }

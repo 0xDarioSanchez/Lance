@@ -1,5 +1,6 @@
 use soroban_sdk::{token, Address, Env, String};
 
+use crate::methods::balance::*;
 use crate::storage::{
     service_status::ServiceStatus, error::Error, service::*, constants::*};
 
@@ -56,7 +57,7 @@ pub fn accept_service(
 
     service.started_moment = env.ledger().timestamp();
 
-    let token = crate::methods::token::get_token(env)?;
+    // let token = crate::methods::token::get_token(env)?;
 
     token_transfer(
         env,
@@ -133,11 +134,61 @@ pub fn approve_service(
         &service.milestone_payment
     )?;
 
-    service.status = ServiceStatus::COMPLETED;
-
-    set_service(env, id, service.clone());
+    remove_service(env, id);
 
     //TODO add event
 
     Ok(service)
 }
+
+pub fn redeem(
+    env: &Env,
+    employee: Address,
+) -> Result<i128, Error> {
+    employee.require_auth();
+
+    let balance = get_balance(env, &employee);
+
+    if balance == 0 {
+        return Err(Error::BalanceIsZero);
+    }
+
+    set_balance(env, &employee, 0);
+
+    token_transfer(
+        env,
+        &env.current_contract_address(),
+        &employee,
+        &balance
+    )?;
+
+    Ok(balance)
+}
+
+//TODO add convertion
+// pub fn convert_and_redeem(
+//     env: &Env,
+//     employee: Address,
+//     conversion_rate: i128
+// ) -> Result<i128, Error> {
+//     employee.require_auth();
+
+//     let balance = get_balance(env, &employee);
+
+//     if balance == 0 {
+//         return Err(Error::BalanceIsZero);
+//     }
+
+//     let converted_amount = balance * conversion_rate;
+
+//     set_balance(env, &employee, 0);
+
+//     token_transfer(
+//         env,
+//         &env.current_contract_address(),
+//         &employee,
+//         &converted_amount
+//     )?;
+
+//     Ok(converted_amount)
+// }                   

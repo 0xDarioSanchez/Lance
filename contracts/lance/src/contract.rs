@@ -88,9 +88,7 @@ impl ContractTrait for Contract {
         metadata: Option<String>,
         milestone_payment: i128
     ) -> Result<(), Error> {
-        creator.require_auth();
-
-        create_service(env, creator, employer, id, duration, metadata, milestone_payment);
+        create_service(env, creator, employer, id, duration, metadata, milestone_payment)?;
         Ok(())
     }  
             
@@ -110,6 +108,7 @@ impl ContractTrait for Contract {
         approve_milestone(env, employer, id)   
    }
 
+    // Approve the service completion from the employer, increasing employee balance and deleting the service.    
    fn approve_service(
         env: &Env,
         employer: Address,

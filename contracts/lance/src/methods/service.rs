@@ -1,7 +1,7 @@
 use soroban_sdk::{Env, Address, String};
 
 use crate::storage::{
-    service_status::ServiceStatus, error::Error, service::*
+    service_status::ServiceStatus, error::Error, service::*, constants::*,
 };
 
 pub fn create_service(
@@ -9,18 +9,24 @@ pub fn create_service(
     creator: Address,
     employer: Address,
     id: u32,
-    duration: u64,
+    duration: u64, // in days
     metadata: Option<String>,
     milestone_payment: i128
 ) -> Result<Service, Error> {
     creator.require_auth();
+
+    if duration < 1 {
+        return Err(Error::InvalidDuration);
+    }
+
+    let duration_in_seconds = duration * SECONDS_PER_DAY; // convert days to seconds
 
     let service = Service {
         id,
         metadata,
         employee: creator.clone(),
         employer,
-        duration,
+        duration : duration_in_seconds,
         buy_moment: env.ledger().timestamp(),
         status: ServiceStatus::CREATED,
         current_milestone: 1,

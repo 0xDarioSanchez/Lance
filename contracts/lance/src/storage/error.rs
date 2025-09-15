@@ -11,4 +11,5 @@ pub enum Error {
     ServiceNotFound = 4,
     DisputeNotFound = 5,
     InsufficientTime = 6,
+    InvalidDuration = 7,
 }

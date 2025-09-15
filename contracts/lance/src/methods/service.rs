@@ -1,12 +1,11 @@
 use soroban_sdk::{Address, Env, String};
 
 use crate::methods::balance::*;
-use crate::storage::{
-    service_status::ServiceStatus, error::Error, service::*, constants::*};
+use crate::storage::{constants::*, error::Error, service::*, service_status::ServiceStatus};
 
 use crate::methods::token::token_transfer;
 
-/* 
+/*
  * Create a new service from the employee, set the status to created and store it.
 */
 pub fn create_service(
@@ -16,7 +15,7 @@ pub fn create_service(
     id: u32,
     duration: u64, // In days
     metadata: Option<String>,
-    milestone_payment: i128
+    milestone_payment: i128,
 ) -> Result<Service, Error> {
     creator.require_auth();
 
@@ -31,11 +30,11 @@ pub fn create_service(
         metadata,
         employee: creator.clone(),
         employer,
-        duration : duration_in_seconds,
+        duration: duration_in_seconds,
         started_moment: 0,
         status: ServiceStatus::CREATED,
         current_milestone: 1,
-        milestone_payment,  
+        milestone_payment,
     };
 
     set_service(env, id, service.clone());
@@ -43,10 +42,9 @@ pub fn create_service(
     //TODO add event
 
     Ok(service)
-}   
+}
 
-
-/* Accept the service from the employer, transfer the first milestone payment 
+/* Accept the service from the employer, transfer the first milestone payment
  * to the contract and set the start time.
 */
 pub fn accept_service(
@@ -70,7 +68,7 @@ pub fn accept_service(
         env,
         &employer,
         &env.current_contract_address(),
-        &service.milestone_payment
+        &service.milestone_payment,
     )?;
 
     service.status = ServiceStatus::ACCEPTED;
@@ -82,16 +80,11 @@ pub fn accept_service(
     Ok(service)
 }
 
-
 /*
  *Approve the milestone from the employer, increase the employee balance accoding
   the milestone payment and let the service as status.
 */
-pub fn approve_milestone(
-    env: &Env,
-    employer: Address,
-    id: u32,
-) -> Result<Service, Error> {
+pub fn approve_milestone(env: &Env, employer: Address, id: u32) -> Result<Service, Error> {
     employer.require_auth();
 
     let mut service = get_service(env, id)?;
@@ -104,12 +97,12 @@ pub fn approve_milestone(
     //     return Err(Error::InsufficientTime);
     // }
 
-    token_transfer(
+    let employee_balance = get_balance(env, &service.employee);
+    set_balance(
         env,
-        &employer,
-        &env.current_contract_address(),
-        &service.milestone_payment
-    )?;
+        &service.employee,
+        employee_balance + service.milestone_payment,
+    );
 
     service.current_milestone += 1;
     service.status = ServiceStatus::WAITING;
@@ -121,15 +114,10 @@ pub fn approve_milestone(
     Ok(service)
 }
 
-
-/* Approve the service from the employer, transfer the last milestone payment 
+/* Approve the service from the employer, transfer the last milestone payment
  * to the contract and remove the service.
 */
-pub fn approve_service(
-    env: &Env,
-    employer: Address,
-    id: u32,
-) -> Result<Service, Error> {
+pub fn approve_service(env: &Env, employer: Address, id: u32) -> Result<Service, Error> {
     employer.require_auth();
 
     let mut service = get_service(env, id)?;
@@ -156,8 +144,7 @@ pub fn approve_service(
     Ok(service)
 }
 
-
-/* 
+/*
  * Add a new milestone from the employee, set a new duration and milestone payment.
 */
 pub fn add_milestone(
@@ -165,7 +152,7 @@ pub fn add_milestone(
     employee: Address,
     id: u32,
     duration: u64, // in days
-    payment: i128
+    payment: i128,
 ) -> Result<Service, Error> {
     employee.require_auth();
 
@@ -182,7 +169,7 @@ pub fn add_milestone(
     if service.duration != 0 || service.milestone_payment != 0 {
         return Err(Error::InvalidService);
     }
-    
+
     let duration_in_seconds = duration * SECONDS_PER_DAY; // convert days to seconds
 
     service.duration += duration_in_seconds;
@@ -195,7 +182,7 @@ pub fn add_milestone(
     Ok(service)
 }
 
-/* 
+/*
  * Redeem the balance of the employee, transfer the amount to his address and set the balance to zero.
 */
 pub fn redeem(
@@ -248,4 +235,4 @@ pub fn redeem(
 //     )?;
 
 //     Ok(converted_amount)
-// }                   
+// }

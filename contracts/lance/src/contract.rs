@@ -2,6 +2,7 @@ use soroban_sdk::{contract, contractimpl, Env, String, Address};
 use crate::methods::{
     dispute::*,
     service::*,
+    balance::*,
 };
 use crate::storage::{
     error::Error,
@@ -68,6 +69,10 @@ pub trait ContractTrait {
         reason: String,
     ) -> Result<Dispute, Error> ;
 
+    fn get_balance(env: &Env, 
+        employee: Address
+    ) -> i128;
+
     fn redeem(
         env: &Env,
         employee: Address,
@@ -130,6 +135,12 @@ impl ContractTrait for Contract {
         id: u32
     ) -> Result<Service, Error> {
         approve_milestone(env, employer, id)   
+   }
+
+   fn get_balance(env: &Env, 
+        employee: Address
+    ) -> i128 {
+        get_balance(env, &employee)
    }
 
     // Approve the service completion from the employer, increasing employee balance and deleting the service.    

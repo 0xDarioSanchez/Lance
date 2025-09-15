@@ -1,10 +1,10 @@
 # Lance: Decentralized Freelance Marketplace
 
-## Problem  //TODO improve
-Centralized freelance platforms charge high fees (5 to 20%), with cross-border payments somethimes  delayed for several days and with an everage cost of 6.04%. While also rely on opaque dispute processes that can favor clients, leaving freelancers vulnerable to non-payment or unfair resolutions. Data breaches and lack of user control over funds erode trust.
+## Problem
+Centralized freelance platforms charge high fees (5 to 20%), with cross-border payments somethimes  delayed for several days and with an average cost of 6.04%. While also rely on dispute processes centralized in the same platform.
 
 ## Solution
-**StellarFreelance** is a decentralized marketplace using Stellar's blockchain for secure, low-cost, instant global payments and smart contract-based escrow to protect freelancers. Clients post jobs, fund escrow with USDC/XLM, and freelancers get paid automatically upon work approval or after a timeout, ensuring fairness without intermediaries. Key benefits:
+**Lance** is a decentralized marketplace using Stellar's blockchain for secure, low-cost, instant global payments and smart contract-based escrow to protect users. Clients post jobs, fund escrow with USDC/XLM, and freelancers get paid automatically upon work approval or dispute resolutions, offering really lower fees, almost zero costs and times for transactions and a decentralized voting system based on game's theory and the Neural Quorum Governance system [link https://github.com/BlockScience/neural-quorum-governance].
 - **Low Fees**: Minimal fees since we will focus our revenue model on yield through Blend Capital.
 - **Fast Payments**: Freelancers can withdraw instantly to their wallets, avoiding conversion or cross-border bank delays.
 - **Free Payments**: Transfers through Stellar have almost no cost even for cross-border payments.
@@ -21,12 +21,12 @@ This MVP demonstrates job/services posting, escrow funding, work submission, and
 - **User Auth**: Freighter wallet for Stellar account management and transaction signing.
 
 ### Flow
-1. Users connects Freighter wallet and access a matching platform for pacting the services to be done.
-via Soroban contract.
+1. Users connects their Stellar wallet and access a matching platform for pacting the services to be done.
 2. Freelancer stablish services conditions and the corresponding employer accept or reget it.
-3. The contract implement Blend to generate yield with the unused funds.
+3. The contract implement Blend to generate yield with the locked funds.
 3. When employers approves, the contract release the funds for the corresponding milestone.
-4. Payments settle instantly on Stellar, viewable on Stellar Explorer.
+4. Payments settle instantly and are transparently viewable on Stellar Explorer.
+5. In case of disagreement users can request for a decentralized intermediation, based on game's theory and the Neural Quorum Governance system, assuring high incentives.  
 
 ## Stellar Components Used
 - **Stellar SDK**: Integrates frontend with Stellar for account management, payments, and contract calls.

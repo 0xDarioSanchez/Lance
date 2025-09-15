@@ -194,9 +194,7 @@
                               "key": {
                                 "symbol": "personal_data"
                               },
-                              "val": {
-                                "string": "Employee 1"
-                              }
+                              "val": "void"
                             }
                           ]
                         }

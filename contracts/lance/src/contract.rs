@@ -162,12 +162,11 @@ impl ContractTrait for Contract {
           create_dispute(env, creator, id, proof)
     } 
     
-     // Redeem the balance for the employee, setting it to zero and returning the amount to be transferred.
-
-   fn redeem(
+    // Redeem the balance for the employee, setting it to zero and returning the amount to be transferred.
+    fn redeem(
         env: &Env,
         employee: Address,
-   ) -> Result<i128, Error> {
+    ) -> Result<i128, Error> {
         redeem(env, employee)   
-   }
+    }
 }

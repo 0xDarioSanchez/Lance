@@ -9,17 +9,13 @@ fn test_add_and_get_user() {
     let env = Env::default();
     env.mock_all_auths();
 
-    let contract = Contract;
     let admin = Address::generate(&env);
-    let token = Address::generate(&env);
+    let token_admin = Address::generate(&env);
 
-    // Register contract AND initialize it in one step
-    let contract_id = env.register(contract, (admin, token));
-    let client = ContractClient::new(&env, &contract_id);
+    let (client, token, token_admin_client, token_id) = create_contract(&env, &admin, &token_admin);
 
     let user_1 = Address::generate(&env);
 
-    // Now you can call other contract methods
     let personal_data = String::from_str(&env, "Employee 1");
     client.new_user(
         &user_1,

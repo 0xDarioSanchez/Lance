@@ -171,7 +171,7 @@
                                 "symbol": "is_employee"
                               },
                               "val": {
-                                "bool": true
+                                "bool": false
                               }
                             },
                             {
@@ -179,7 +179,7 @@
                                 "symbol": "is_employer"
                               },
                               "val": {
-                                "bool": false
+                                "bool": true
                               }
                             },
                             {
@@ -194,9 +194,7 @@
                               "key": {
                                 "symbol": "personal_data"
                               },
-                              "val": {
-                                "string": "Employee 1"
-                              }
+                              "val": "void"
                             }
                           ]
                         }

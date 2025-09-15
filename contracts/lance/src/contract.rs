@@ -38,6 +38,11 @@ pub trait ContractTrait {
         milestone_payment: i128
     ) -> Result<(), Error> ;
 
+    fn get_service(
+        env: Env, 
+        id: u32
+    ) -> Result<Service, Error>;
+
     fn accept_service(
         env: &Env,
         employer: Address,
@@ -92,6 +97,10 @@ impl ContractTrait for Contract {
 
     fn get_user(env: Env, user: Address,) -> Result<User, Error> {
         get_user(&env, user)
+    }
+
+    fn get_service(env: Env, id: u32) -> Result<Service, Error> {
+        get_service(&env, id)
     }
 
     fn create_service(

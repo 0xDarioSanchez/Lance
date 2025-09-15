@@ -1,11 +1,8 @@
 #![cfg(test)]
 
-use soroban_sdk::{
-    testutils::{Address as _, Ledger, MockAuth, MockAuthInvoke},
-    token, vec, Env, IntoVal, String, Symbol, Address
-};
+use soroban_sdk::{testutils::Address as _, Address, Env, String};
 
-use crate::contract::{Contract, ContractClient, ContractTrait};
+use crate::contract::{Contract, ContractClient};
 
 #[test]
 fn test_add_and_get_user() {
@@ -26,9 +23,9 @@ fn test_add_and_get_user() {
     let personal_data = String::from_str(&env, "Employee 1");
     client.new_user(
         &user_1,
-        &true,   // is_employee
-        &false,  // is_employer
-        &false,  // is_judge
+        &true,  // is_employee
+        &false, // is_employer
+        &false, // is_judge
         &Some(personal_data.clone()),
     );
 

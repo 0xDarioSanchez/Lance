@@ -8,7 +8,7 @@ pub fn create_dispute(
     env: &Env,
     creator: Address,
     service_id: u32,
-    metadata: String
+    proof: String
 ) -> Result<Dispute, Error> {
     creator.require_auth();
 
@@ -41,7 +41,7 @@ pub fn create_dispute(
         employer: employer.clone(),  
         winner: None,
         employee_proves: None,      
-        employer_proves: metadata,
+        employer_proves: proof,
         payment: service.milestone_payment,
     };
 

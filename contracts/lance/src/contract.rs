@@ -1,10 +1,13 @@
 use soroban_sdk::{contract, contractimpl, Env, String, Address};
-use crate::methods::service::*;
+use crate::methods::{
+    dispute::*,
+    service::*,
+};
 use crate::storage::{
     error::Error,
     user::*,
     service::*,
-    service_status::ServiceStatus
+    dispute::*, 
 };
 use crate::methods::{
     initialize::initialize,
@@ -52,6 +55,13 @@ pub trait ContractTrait {
         employer: Address,
         id: u32
     ) -> Result<Service, Error>;
+
+    fn create_dispute(
+        env: &Env,
+        creator: Address,
+        id: u32,
+        reason: String,
+    ) -> Result<Dispute, Error> ;
 
     fn redeem(
         env: &Env,
@@ -120,7 +130,19 @@ impl ContractTrait for Contract {
         id: u32
     ) -> Result<Service, Error> {
         approve_service(env, employer, id)   
-   }
+    }
+    
+    // Create a dispute for a service, can be created by either party involved in the service.  
+    fn create_dispute(
+          env: &Env,
+          creator: Address,
+          id: u32,
+          proof: String,
+     ) -> Result<Dispute, Error> {
+          create_dispute(env, creator, id, proof)
+    } 
+    
+     // Redeem the balance for the employee, setting it to zero and returning the amount to be transferred.
 
    fn redeem(
         env: &Env,

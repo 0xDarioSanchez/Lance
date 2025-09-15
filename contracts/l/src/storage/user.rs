@@ -20,8 +20,14 @@ pub(crate) fn get_user(env: &Env, user: Address) -> Result<User, Error> {
         .ok_or(Error::UserNotFound)
 }
 
-pub(crate) fn set_user(env: &Env, user: User) {
-    let key = DataKey::Users(user.address.clone());
+pub(crate) fn set_user(
+        env: Env,
+        user: Address,
+        is_employee: bool,
+        is_employer: bool,
+        is_judge: bool,
+        personal_data: Option<String>,) {
+    let key = DataKey::Users(user.clone());
 
     env.storage().instance().set(&key, &user)
 }

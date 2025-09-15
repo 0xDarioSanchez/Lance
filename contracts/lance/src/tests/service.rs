@@ -1,24 +1,20 @@
 #![cfg(test)]
 
-use soroban_sdk::{testutils::Address as _, Address, Env, String};
-
-use crate::contract::{Contract, ContractClient};
+use crate::tests::config::{constants::BASE_MINT_AMOUNT, contract::ContractTest};
+use soroban_sdk::String;
 
 #[test]
 fn test_add_and_new_service() {
-    let env = Env::default();
+    let ContractTest {
+        env,
+        contract,
+        employee_1,
+        employer_1,
+        ..
+    } = ContractTest::setup();
+
     env.mock_all_auths();
 
-    let contract = Contract;
-    let admin = Address::generate(&env);
-    let token = Address::generate(&env);
-
-    // Register contract AND initialize it in one step
-    let contract_id = env.register(contract, (admin, token));
-    let client = ContractClient::new(&env, &contract_id);
-
-    let emploee_1 = Address::generate(&env);
-    let employer_1 = Address::generate(&env);
     let service_id_1: u32 = 1;
     let one_day_duration: u64 = 1; // days
     let milestone_payment: i128 = 1000;
@@ -26,8 +22,8 @@ fn test_add_and_new_service() {
     // Now you can call other contract methods
     let service_metadata = String::from_str(&env, "Service 1");
 
-    client.create_service(
-        &emploee_1,
+    contract.create_service(
+        &employee_1,
         &employer_1,
         &service_id_1,
         &one_day_duration,
@@ -35,12 +31,53 @@ fn test_add_and_new_service() {
         &milestone_payment,
     );
 
-    let service_data = client.get_service(&service_id_1);
+    let service_data = contract.get_service(&service_id_1);
 
     assert_eq!(service_data.id, service_id_1);
-    assert_eq!(service_data.employee, emploee_1);
+    assert_eq!(service_data.employee, employee_1);
     assert_eq!(service_data.employer, employer_1);
     assert_eq!(service_data.duration, one_day_duration * 86400); // in seconds
     assert_eq!(service_data.metadata, Some(service_metadata));
     assert_eq!(service_data.milestone_payment, milestone_payment);
+}
+
+#[test]
+fn test_accept_service() {
+    let ContractTest {
+        env,
+        contract,
+        employee_1,
+        employer_1,
+        token,
+        ..
+    } = ContractTest::setup();
+
+    env.mock_all_auths();
+    let (token_client, _, _) = token;
+
+    let service_id_1: u32 = 1;
+    let one_day_duration: u64 = 1; // days
+    let milestone_payment: i128 = 1000;
+
+    assert_eq!(token_client.balance(&contract.address), 0);
+    assert_eq!(token_client.balance(&employee_1), BASE_MINT_AMOUNT);
+    assert_eq!(token_client.balance(&employer_1), BASE_MINT_AMOUNT);
+
+    contract.create_service(
+        &employee_1,
+        &employer_1,
+        &service_id_1,
+        &one_day_duration,
+        &None,
+        &milestone_payment,
+    );
+
+    contract.accept_service(&employer_1, &service_id_1);
+
+    assert_eq!(token_client.balance(&employee_1), BASE_MINT_AMOUNT);
+    assert_eq!(
+        token_client.balance(&employer_1),
+        BASE_MINT_AMOUNT - milestone_payment
+    );
+    assert_eq!(token_client.balance(&contract.address), milestone_payment);
 }

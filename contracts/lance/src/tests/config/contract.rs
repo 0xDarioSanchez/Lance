@@ -11,6 +11,7 @@ pub struct ContractTest<'a> {
     pub employee_1: Address,
     pub employer_1: Address,
     pub token: (token::Client<'a>, token::StellarAssetClient<'a>, Address),
+    pub service_1: (u32, u64, i128),
 }
 
 impl<'a> ContractTest<'a> {
@@ -42,6 +43,7 @@ impl<'a> ContractTest<'a> {
             employee_1,
             employer_1,
             token: (token_client, token_admin, token_issuer),
+            service_1: (1, 1, 1000), // id, duration in days, milestone payment
         }
     }
 }

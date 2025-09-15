@@ -130,12 +130,12 @@ pub fn approve_service(env: &Env, employer: Address, id: u32) -> Result<Service,
     //     return Err(Error::InsufficientTime);
     // }
 
-    token_transfer(
+    let employee_balance = get_balance(env, &service.employee);
+    set_balance(
         env,
-        &employer,
-        &env.current_contract_address(),
-        &service.milestone_payment
-    )?;
+        &service.employee,
+        employee_balance + service.milestone_payment,
+    );
 
     remove_service(env, id);
 

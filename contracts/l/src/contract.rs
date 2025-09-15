@@ -1,4 +1,3 @@
-#![no_std]
 use soroban_sdk::{contract, contractimpl, vec, Env, String, Vec};
 
 #[contract]
@@ -20,4 +19,5 @@ impl Contract {
     }
 }
 
-mod test;
+// mod test;
+

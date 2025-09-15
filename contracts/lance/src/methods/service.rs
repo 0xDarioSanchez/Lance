@@ -47,11 +47,7 @@ pub fn create_service(
 /* Accept the service from the employer, transfer the first milestone payment
  * to the contract and set the start time.
 */
-pub fn accept_service(
-    env: &Env,
-    employer: Address,
-    id: u32
-) -> Result<Service, Error> {
+pub fn accept_service(env: &Env, employer: Address, id: u32) -> Result<Service, Error> {
     employer.require_auth();
 
     let mut service = get_service(env, id)?;
@@ -120,7 +116,7 @@ pub fn approve_milestone(env: &Env, employer: Address, id: u32) -> Result<Servic
 pub fn approve_service(env: &Env, employer: Address, id: u32) -> Result<Service, Error> {
     employer.require_auth();
 
-    let mut service = get_service(env, id)?;
+    let service = get_service(env, id)?;
 
     if service.employer != employer {
         return Err(Error::NotAuthorized);
@@ -185,10 +181,7 @@ pub fn add_milestone(
 /*
  * Redeem the balance of the employee, transfer the amount to his address and set the balance to zero.
 */
-pub fn redeem(
-    env: &Env,
-    employee: Address,
-) -> Result<i128, Error> {
+pub fn redeem(env: &Env, employee: Address) -> Result<i128, Error> {
     employee.require_auth();
 
     let balance = get_balance(env, &employee);
@@ -199,12 +192,7 @@ pub fn redeem(
 
     set_balance(env, &employee, 0);
 
-    token_transfer(
-        env,
-        &env.current_contract_address(),
-        &employee,
-        &balance
-    )?;
+    token_transfer(env, &env.current_contract_address(), &employee, &balance)?;
 
     Ok(balance)
 }

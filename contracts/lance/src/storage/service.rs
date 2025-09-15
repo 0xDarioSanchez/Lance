@@ -9,7 +9,7 @@ pub struct Service {
     pub employee: Address,
     pub employer: Address,
     pub duration: u64,
-    pub buy_moment: u64,
+    pub started_moment: u64,
     pub status: ServiceStatus,
     pub current_milestone: u32,
     pub milestone_payment: i128, 

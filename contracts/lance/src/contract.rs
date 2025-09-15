@@ -40,6 +40,18 @@ pub trait ContractTrait {
         employer: Address,
         id: u32
     ) -> Result<Service, Error>;
+
+       fn approve_milestone(
+        env: &Env,
+        employer: Address,
+        id: u32
+    ) -> Result<Service, Error>;
+
+   fn approve_service(
+        env: &Env,
+        employer: Address,
+        id: u32
+    ) -> Result<Service, Error>;
 }
 
 #[contract]
@@ -88,6 +100,22 @@ impl ContractTrait for Contract {
         id: u32
     ) -> Result<Service, Error> {
         accept_service(env, employer, id)   
+   }
+
+   fn approve_milestone(
+        env: &Env,
+        employer: Address,
+        id: u32
+    ) -> Result<Service, Error> {
+        approve_milestone(env, employer, id)   
+   }
+
+   fn approve_service(
+        env: &Env,
+        employer: Address,
+        id: u32
+    ) -> Result<Service, Error> {
+        approve_service(env, employer, id)   
    }
 
 }

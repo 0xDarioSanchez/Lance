@@ -21,13 +21,21 @@ pub(crate) fn get_user(env: &Env, user: Address) -> Result<User, Error> {
 }
 
 pub(crate) fn set_user(
-        env: Env,
+        env: &Env,
         user: Address,
         is_employee: bool,
         is_employer: bool,
         is_judge: bool,
         personal_data: Option<String>,) {
+    let new_user = User {
+        address: user.clone(),
+        is_employee,
+        is_employer,
+        is_judge,
+        personal_data,
+    };
+
     let key = DataKey::Users(user.clone());
 
-    env.storage().instance().set(&key, &user)
+    env.storage().instance().set(&key, &new_user);
 }

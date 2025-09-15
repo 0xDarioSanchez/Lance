@@ -12,16 +12,16 @@ use crate::methods::{
 };
 
 pub trait ContractTrait {
-    fn __constructor(env: Env, admin: Address, token: Address) -> Result<(), Error>;
+    fn __constructor(env: Env, admin: Address, token: Address) -> Result<(), Error>; // Keep as is
 
     fn new_user(
         env: Env,
-        user: Address,
+        user: Address, // This is fine, but let's see the impl
         is_employee: bool,
         is_employer: bool,
         is_judge: bool,
         personal_data: Option<String>,
-    ) -> Result<(), Error> ;
+    ) -> Result<(), Error>;
 
     fn get_user(env: Env, user: Address,) -> Result<User, Error> ;
 
@@ -53,13 +53,13 @@ impl ContractTrait for Contract {
 
     fn new_user(
         env: Env,
-        user: Address,
+        user: Address, // The implementation takes Address by value
         is_employee: bool,
         is_employer: bool,
         is_judge: bool,
         personal_data: Option<String>,
     ) -> Result<(), Error> {
-        set_user(env, user, is_employee, is_employer, is_judge, personal_data);
+        set_user(&env, user, is_employee, is_employer, is_judge, personal_data);
         Ok(())
     }
 

@@ -4,7 +4,7 @@
 echo "***************************"
 echo -e "\t*****Building*****..."
 echo "***************************"
-cargo build --target wasm32v1-none --release && stellar contract optimize --wasm target/wasm32v1-none/release/practice.wasm
+cargo build --target wasm32v1-none --release && stellar contract optimize --wasm target/wasm32v1-none/release/lance.wasm
 
 echo "*************************"
 echo -e "\t****Deploying**** ..."

@@ -52,6 +52,11 @@ pub trait ContractTrait {
         employer: Address,
         id: u32
     ) -> Result<Service, Error>;
+
+    fn redeem(
+        env: &Env,
+        employee: Address,
+   ) -> Result<i128, Error> ;
 }
 
 #[contract]
@@ -117,4 +122,10 @@ impl ContractTrait for Contract {
         approve_service(env, employer, id)   
    }
 
+   fn redeem(
+        env: &Env,
+        employee: Address,
+   ) -> Result<i128, Error> {
+        redeem(env, employee)   
+   }
 }

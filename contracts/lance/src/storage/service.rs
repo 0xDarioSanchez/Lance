@@ -15,13 +15,13 @@ pub struct Service {
     pub milestone_payment: i128, 
 }
 
-pub(crate) fn set_service(env: &Env, service_id: u32, service: Service) {
+pub fn set_service(env: &Env, service_id: u32, service: Service) {
     let key = DataKey::Services(service_id);
 
     env.storage().instance().set(&key, &service)
 }
 
-pub(crate) fn get_service(env: &Env, service_id: u32) -> Result<Service, Error> {
+pub fn get_service(env: &Env, service_id: u32) -> Result<Service, Error> {
     let key = DataKey::Services(service_id);
 
     env.storage()
@@ -30,7 +30,7 @@ pub(crate) fn get_service(env: &Env, service_id: u32) -> Result<Service, Error> 
         .ok_or(Error::ServiceNotFound)
 }
 
-pub(crate) fn remove_service(env: &Env, service_id: u32) {
+pub fn remove_service(env: &Env, service_id: u32) {
     let key = DataKey::Services(service_id);
     env.storage().instance().remove(&key);  
 }

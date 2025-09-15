@@ -13,4 +13,8 @@ pub enum Error {
     InsufficientTime = 6,
     InvalidDuration = 7,
     BalanceIsZero = 8,
+    InvalidStatus = 9,
+    InvalidService = 10,
+    InvalidServiceStatus = 11,
+    DisputeAlreadyCreated = 12,
 }

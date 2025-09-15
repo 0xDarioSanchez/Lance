@@ -7,5 +7,4 @@ pub enum ServiceStatus {
     ACCEPTED, 
     WAITING,
     DISPUTING,
-    COMPLETED,
 }

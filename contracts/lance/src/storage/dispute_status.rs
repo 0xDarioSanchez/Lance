@@ -2,7 +2,7 @@ use soroban_sdk::contracttype;
 
 #[derive(Clone, PartialEq)]
 #[contracttype]
-pub enum DisputaStat {
+pub enum DisputeStatus {
     OPEN,
     VOTING, 
     EXECUTED,

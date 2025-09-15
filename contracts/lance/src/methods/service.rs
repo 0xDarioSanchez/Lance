@@ -1,4 +1,4 @@
-use soroban_sdk::{token, Address, Env, String};
+use soroban_sdk::{Address, Env, String};
 
 use crate::methods::balance::*;
 use crate::storage::{
@@ -6,12 +6,15 @@ use crate::storage::{
 
 use crate::methods::token::token_transfer;
 
+/* 
+ * Create a new service from the employee, set the status to created and store it.
+*/
 pub fn create_service(
     env: &Env,
     creator: Address,
     employer: Address,
     id: u32,
-    duration: u64, // in days
+    duration: u64, // In days
     metadata: Option<String>,
     milestone_payment: i128
 ) -> Result<Service, Error> {
@@ -42,6 +45,10 @@ pub fn create_service(
     Ok(service)
 }   
 
+
+/* Accept the service from the employer, transfer the first milestone payment 
+ * to the contract and set the start time.
+*/
 pub fn accept_service(
     env: &Env,
     employer: Address,
@@ -75,6 +82,11 @@ pub fn accept_service(
     Ok(service)
 }
 
+
+/*
+ *Approve the milestone from the employer, increase the employee balance accoding
+  the milestone payment and let the service as status.
+*/
 pub fn approve_milestone(
     env: &Env,
     employer: Address,
@@ -110,6 +122,9 @@ pub fn approve_milestone(
 }
 
 
+/* Approve the service from the employer, transfer the last milestone payment 
+ * to the contract and remove the service.
+*/
 pub fn approve_service(
     env: &Env,
     employer: Address,
@@ -141,6 +156,48 @@ pub fn approve_service(
     Ok(service)
 }
 
+
+/* 
+ * Add a new milestone from the employee, set a new duration and milestone payment.
+*/
+pub fn add_milestone(
+    env: &Env,
+    employee: Address,
+    id: u32,
+    duration: u64, // in days
+    payment: i128
+) -> Result<Service, Error> {
+    employee.require_auth();
+
+    let mut service = get_service(env, id)?;
+
+    if service.employee != employee {
+        return Err(Error::NotAuthorized);
+    }
+
+    if service.status != ServiceStatus::WAITING {
+        return Err(Error::InvalidStatus);
+    }
+
+    if service.duration != 0 || service.milestone_payment != 0 {
+        return Err(Error::InvalidService);
+    }
+    
+    let duration_in_seconds = duration * SECONDS_PER_DAY; // convert days to seconds
+
+    service.duration += duration_in_seconds;
+    service.milestone_payment += payment;
+
+    set_service(env, id, service.clone());
+
+    //TODO add event
+
+    Ok(service)
+}
+
+/* 
+ * Redeem the balance of the employee, transfer the amount to his address and set the balance to zero.
+*/
 pub fn redeem(
     env: &Env,
     employee: Address,

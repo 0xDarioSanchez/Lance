@@ -1,24 +1,23 @@
 use soroban_sdk::{contracttype, Address, String, Vec, Env};
-use super::{dispute_status::DisputaStat};
+use super::{dispute_status::DisputeStatus, vote::Vote};
 use crate::storage::{error::Error, storage::DataKey};
 
 
 #[derive(Clone)]
 #[contracttype]
 pub struct Dispute {
-    id: u32,
-    dispute_id: u32,
-    jury_members: Vec<Address>,
-    // votes: Vec<Vote>,
-    dispute_status: DisputaStat,
-    initial_timestamp: u64,
-    finish_timestamp: Option<u64>,
-    employee: Address,
-    employer: Address,  
-    winner: Option<Address>,
-    employee_proves: String,      
-    employer_proves: Option<String>,
-    payment: i128,
+    pub dispute_id: u32,
+    pub jury_members: Vec<Address>,
+    pub votes: Vec<Vote>,
+    pub dispute_status: DisputeStatus,
+    pub initial_timestamp: u64,
+    pub finish_timestamp: Option<u64>,
+    pub employee: Address,
+    pub employer: Address,  
+    pub winner: Option<Address>,
+    pub employee_proves: Option<String>,      
+    pub employer_proves: String,
+    pub payment: i128,
 }
 
 pub(crate) fn get_dispute(env: &Env, dispute_id: u32) -> Result<Dispute, Error> {

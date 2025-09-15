@@ -29,7 +29,7 @@ via Soroban contract.
 4. Payments settle instantly on Stellar, viewable on Stellar Explorer.
 
 ## Stellar Components Used
-- **Stellar SDK (JavaScript)**: Integrates frontend with Stellar for account management, payments, and contract calls.
+- **Stellar SDK**: Integrates frontend with Stellar for account management, payments, and contract calls.
 - **Soroban**: Rust-based smart contracts for escrow (create, fund, release, timeout). Deployed on Futurenet testnet.
 - **Horizon API**: Queries ledger for transaction history and account balances.
 - **Freighter Wallet**: Browser extension for user authentication and transaction signing.
@@ -45,7 +45,61 @@ via Soroban contract.
 
 ...
 
-### Roadmap
+
+## Deployment
+
+### Prerequisites
+
+- Rust toolchain with `wasm32-unknown-unknown` target
+- Soroban CLI
+- Stellar network access (testnet/mainnet)
+
+### Build, deploy and execute
+
+Inside main folder give permission to script files for being executed with:
+```bash
+chmod +x ./accounts.sh
+chmod +x ./run.sh
+```
+
+Execute accounts.sh only once running
+```bash
+./accounts.sh
+```
+Execute run.sh only once runningto build, optimize and execute transations
+```bash
+./run.sh
+```
+### Tests
+
+For running test execute
+```bash
+cargo test
+```
+
+## Security Features
+
+- **Access Control**: Only admin and authorized crowdfunding contract can mint
+- **Proof Uniqueness**: Prevents duplicate NFTs for the same proof
+- **Validation System**: Two-step process (creation + validation)
+- **Immutable Records**: NFT metadata provides permanent milestone records
+
+## Testing
+
+Run the test suite:
+
+```bash
+cargo test
+```
+
+Key test scenarios:
+- Contract initialization
+- Milestone minting and validation
+- Token transfers and approvals
+- Campaign progress tracking
+- Unauthorized access prevention
+
+## Roadmap
 
 - [x] Develop MVP with main functionalities 
 - [x] Develop basic front-end to showcase user interactions 

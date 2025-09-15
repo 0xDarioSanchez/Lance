@@ -9,6 +9,7 @@ crate-type = ["lib", "cdylib"]
 doctest = false
 
 [dependencies]
+blend-contract-sdk = "2.22.0"
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]

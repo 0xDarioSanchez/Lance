@@ -19,4 +19,8 @@ pub enum Error {
     DisputeAlreadyCreated = 12,
     InvalidDisputeStatus = 13,
     JudgeNotFound = 14,
+    InvalidAmount = 15,
+    NoPositionInBlend = 16,
+    InsufficientFundsInBlend = 17,
+    NoTokensToLend = 18,
 }

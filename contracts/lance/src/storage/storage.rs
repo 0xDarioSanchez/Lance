@@ -6,6 +6,7 @@ pub enum DataKey {
     Admin,
     Token,
     BlendPool,
+    TotalPrincipal,
     Users(Address),
     Services(u32),
     Disputes(u32),

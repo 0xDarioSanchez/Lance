@@ -1,5 +1,5 @@
-use soroban_sdk::{token, Address, Env};
-
+use soroban_sdk::{token, Address, Env, Symbol, Vec, vec};
+use blend_contract_sdk::pool;
 use crate::methods::balance::*;
 use crate::storage::{
     constants::*, error::Error, service::*, service_status::ServiceStatus, storage::DataKey,
@@ -9,66 +9,69 @@ use crate::methods::token::token_transfer;
 
 const TOKEN: DataKey = DataKey::Token;
 const BLEND_POOL: DataKey = DataKey::BlendPool;
+const ADMIN: DataKey = DataKey::Admin; 
+const TOTAL_PRINCIPAL: DataKey = DataKey::TotalPrincipal;
+
+// Blend pool request type codes
+const BLEND_SUPPLY_REQUEST: u32 = 0;
+const BLEND_WITHDRAW_REQUEST: u32 = 1;
+const BLEND_BORROW_REQUEST: u32 = 2;
+const BLEND_REPAY_REQUEST: u32 = 3;
+const DEFAULT_RESERVE_ID: u32 = 0; 
 
 pub(crate) fn set_blend_pool(env: &Env, blend_pool: &Address) {
     let key = DataKey::BlendPool;
-
     env.storage().instance().set(&key, blend_pool);
 }
 
 pub(crate) fn get_blend_pool(env: &Env) -> Result<Address, Error> {
     let key = DataKey::BlendPool;
-
     env.storage()
         .instance()
         .get(&key)
         .ok_or(Error::ContractNotInitialized)
 }
 
-pub fn lend_to_blend(env: Env) -> i128 {
+/// Supply (lend) all tokens held by the contract into the Blend pool.
+/// Only callable by admin.
+pub fn lend_to_blend(env: Env) -> Result<i128, Error> {
+
+    let admin: Address = env
+        .storage()
+        .instance()
+        .get(&ADMIN)
+        .ok_or(Error::ContractNotInitialized)?;
+    admin.require_auth();
+
     let token_address: Address = env.storage().instance().get(&TOKEN).unwrap();
     let blend_pool_address: Address = env.storage().instance().get(&BLEND_POOL).unwrap();
 
     let token = token::Client::new(&env, &token_address);
     let blend_pool = pool::Client::new(&env, &blend_pool_address);
 
-    // Get current contract balance
+    // Get current contract token balance
     let contract_balance = token.balance(&env.current_contract_address());
 
     if contract_balance <= 0 {
-        //TODO implement a minimal contract balance to assure liquidity for instant user payments
-        panic_with_error!(&env, &EscrowError::NoTokensToLend);
+        // TODO: implement a minimal contract idle buffer if you want instant payouts
+        return Err(Error::NoTokensToLend);
     }
 
-    env.authorize_as_current_contract(vec![
-        &env,
-        InvokerContractAuthEntry::Contract(SubContractInvocation {
-            context: ContractContext {
-                contract: token_address.clone(),
-                fn_name: Symbol::new(&env, "transfer"),
-                args: (
-                    env.current_contract_address(),
-                    blend_pool_address.clone(),
-                    contract_balance,
-                )
-                    .into_val(&env),
-            },
-            sub_invocations: vec![&env],
-        }),
-    ]);
-
+    // Build supply request (SupplyCollateral)
     let supply_request = pool::Request {
-        request_type: BLEND_SUPPLY_REQUEST,
+        request_type: BLEND_SUPPLY_REQUEST, // keep your constant
         address: token_address.clone(),
         amount: contract_balance,
     };
 
     let requests = Vec::from_array(&env, [supply_request]);
 
-    blend_pool.submit(
-        &env.current_contract_address(), // from (this contract)
+    // Use submit_with_allowance: pool will pull tokens (allowance) and mint bTokens to this contract.
+    // This avoids doing an explicit token.transfer and avoids needing `authorize_as_current_contract`.
+    blend_pool.submit_with_allowance(
+        &env.current_contract_address(), // from (this contract is the source of funds / allowance)
         &env.current_contract_address(), // spender (this contract)
-        &env.current_contract_address(), // to (bTokens recipient - this contract)
+        &env.current_contract_address(), // recipient of bTokens (this contract)
         &requests,
     );
 
@@ -81,21 +84,33 @@ pub fn lend_to_blend(env: Env) -> i128 {
         contract_balance,
     );
 
-    contract_balance
+    Ok(contract_balance)
 }
 
-pub fn withdraw_from_blend(env: Env) -> i128 {
+/// Withdraw the entire position from Blend back to this contract.
+/// Only callable by admin.
+pub fn withdraw_from_blend(env: Env) -> Result<i128, Error> {
+    // --- admin-only ---
+    let admin: Address = env
+        .storage()
+        .instance()
+        .get(&ADMIN)
+        .ok_or(Error::ContractNotInitialized)?;
+    admin.require_auth();
+
     let token_address: Address = env.storage().instance().get(&TOKEN).unwrap();
     let blend_pool_address: Address = env.storage().instance().get(&BLEND_POOL).unwrap();
 
     let blend_pool = pool::Client::new(&env, &blend_pool_address);
 
-    // Get current positions to withdraw entire balance
+    // Get current positions (bToken supply/pool position) for this contract
     let positions = blend_pool.get_positions(&env.current_contract_address());
-    let total_supply = positions.supply.get(0).unwrap_or(0); // Assuming reserve_id 0, adjust as needed
+
+    // Assume reserve_id 0 or DEFAULT_RESERVE_ID; adjust as your pool config requires
+    let total_supply = positions.supply.get(DEFAULT_RESERVE_ID).unwrap_or(0);
 
     if total_supply <= 0 {
-        panic_with_error!(&env, &EscrowError::NoPositionInBlend);
+        return Err(Error::NoPositionInBlend);
     }
 
     // Create withdrawal request for entire position
@@ -107,11 +122,11 @@ pub fn withdraw_from_blend(env: Env) -> i128 {
 
     let requests = Vec::from_array(&env, [withdraw_request]);
 
-    // Submit withdrawal request
-    blend_pool.submit(
-        &env.current_contract_address(), // from (this contract)
-        &env.current_contract_address(), // spender (this contract)
-        &env.current_contract_address(), // to (withdrawal recipient - this contract)
+    // Use submit_with_allowance so pool can burn bTokens and transfer tokens back to this contract
+    blend_pool.submit_with_allowance(
+        &env.current_contract_address(), // from (this contract holds the bTokens)
+        &env.current_contract_address(), // spender
+        &env.current_contract_address(), // recipient (this contract)
         &requests,
     );
 
@@ -124,45 +139,55 @@ pub fn withdraw_from_blend(env: Env) -> i128 {
         total_supply,
     );
 
-    total_supply
+    Ok(total_supply)
 }
 
-pub fn withdraw_amount_from_blend(env: Env, amount: i128) -> i128 {
+/// Withdraw a specific amount from Blend back to this contract.
+/// Only callable by admin.
+pub fn withdraw_amount_from_blend(env: Env, amount: i128) -> Result<i128, Error> {
     if amount <= 0 {
-        panic_with_error!(&env, &EscrowError::AmountMustBePositive);
+        return Err(Error::InvalidAmount);
     }
+
+    // --- admin-only ---
+    let admin: Address = env
+        .storage()
+        .instance()
+        .get(&ADMIN)
+        .ok_or(Error::ContractNotInitialized)?;
+    admin.require_auth();
 
     let token_address: Address = env.storage().instance().get(&TOKEN).unwrap();
     let blend_pool_address: Address = env.storage().instance().get(&BLEND_POOL).unwrap();
 
     let blend_pool = pool::Client::new(&env, &blend_pool_address);
 
-    // Get current positions to check available balance
+    // Get current positions to check available bToken supply
     let positions = blend_pool.get_positions(&env.current_contract_address());
     let total_supply = positions.supply.get(DEFAULT_RESERVE_ID).unwrap_or(0);
 
     if total_supply <= 0 {
-        panic_with_error!(&env, &EscrowError::NoPositionInBlend);
+        return Err(Error::NoPositionInBlend);
     }
 
     if amount > total_supply {
-        panic_with_error!(&env, &EscrowError::InsufficientFundsInBlend);
+        return Err(Error::InsufficientFundsInBlend);
     }
 
     // Create withdrawal request for specified amount
     let withdraw_request = pool::Request {
-        request_type: 1, // Withdraw request type
+        request_type: BLEND_WITHDRAW_REQUEST, // use the constant instead of magic number
         address: token_address.clone(),
-        amount: amount,
+        amount,
     };
 
     let requests = Vec::from_array(&env, [withdraw_request]);
 
-    // Submit withdrawal request
-    blend_pool.submit(
+    // Pool will burn bTokens and send tokens back to this contract
+    blend_pool.submit_with_allowance(
         &env.current_contract_address(), // from (this contract)
-        &env.current_contract_address(), // spender (this contract)
-        &env.current_contract_address(), // to (withdrawal recipient - this contract)
+        &env.current_contract_address(), // spender
+        &env.current_contract_address(), // recipient
         &requests,
     );
 
@@ -175,5 +200,5 @@ pub fn withdraw_amount_from_blend(env: Env, amount: i128) -> i128 {
         amount,
     );
 
-    amount
+    Ok(amount)
 }

@@ -126,3 +126,12 @@ Key test scenarios:
 - [ ] Create documentation and video tutorials for better user boarding 
 - [ ] Implement support for multiple Stellar-compatible wallet providers
 - [ ] Implement governance system for community-driven protocol upgrades
+
+
+## Screenshots
+
+![frontend](images/frontend.jpg "Front-End")
+![script](images/script1.jpg "Running script 1")
+![script](images/script2.jpg "Running script 2")
+![public_functions](images/public_functions.jpg "Public Functions")
+![transactions](images/transactions.jpg "Transactions")

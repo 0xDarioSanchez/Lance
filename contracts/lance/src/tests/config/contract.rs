@@ -1,4 +1,4 @@
-use soroban_sdk::{testutils::Address as _, token, Address, Env};
+use soroban_sdk::{Address, Env, token, testutils::Address as TestAddress};
 
 use crate::{contract::ContractClient, Contract};
 
@@ -18,13 +18,12 @@ impl<'a> ContractTest<'a> {
     pub fn setup() -> Self {
         let env = Env::default();
 
-        let admin = Address::generate(&env);
-        let token_issuer = Address::generate(&env);
+        let admin: Address = Address::generate(&env);
+        let employee_1: Address = Address::generate(&env);
+        let employer_1: Address = Address::generate(&env);
+        let blend_pool: Address = Address::generate(&env);
+        let token_issuer: Address = Address::generate(&env);
 
-        let employee_1 = Address::generate(&env);
-        let employer_1 = Address::generate(&env);
-
-        let blend_pool = Address::generate(&env);
 
         let (token_client, token_admin) = create_token_contract(&env, &token_issuer);
 

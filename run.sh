@@ -13,17 +13,18 @@ stellar contract deploy \
   --wasm target/wasm32v1-none/release/lance.optimized.wasm \
   --source-account lancer-admin \
   --network testnet \
-  --alias practice \
+  --alias lance \
   -- \
   --admin lancer-admin \
-  --token CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+  --token CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC \
+  --blend-pool CD6SJIRPOSP5NC73ZWJ36WT3PS34M6YUMOVDALMAR74IKXWGMX5VMEAG
 # CD6SJIRPOSP5NC73ZWJ36WT3PS34M6YUMOVDALMAR74IKXWGMX5VMEAG
 
 echo "***********************************************"
 echo -e "\tRegistration of Employee 1 ..."
 echo "***********************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employee-1 \
     --network testnet \
     -- new_user \
@@ -37,7 +38,7 @@ echo "****************************************"
 echo -e "\tGet Employee 1 ..."
 echo "*****************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employee-1 \
     --network testnet \
     -- get_user \
@@ -47,7 +48,7 @@ echo "**************************************"
 echo -e "\tRegistration Employer 1 ..."
 echo "**************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employer-1 \
     --network testnet \
     -- new_user \
@@ -61,7 +62,7 @@ echo "**************************************************"
 echo -e "\tCreation Service 1 from Employer 1 ..."
 echo "**************************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employee-1 \
     --network testnet \
     -- create_service \
@@ -76,7 +77,7 @@ echo "**************************************************"
 echo -e "\tAccepting Service 1 from Employer 1 ..."
 echo "**************************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employer-1 \
     --network testnet \
     -- accept_service \
@@ -87,7 +88,7 @@ echo "*******************************************************************"
 echo -e "\tApproving milestione for Service 1 from Employer 1 ..."
 echo "*******************************************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employer-1 \
     --network testnet \
     -- approve_service \
@@ -99,7 +100,7 @@ echo "**********************************************************"
 echo -e "\tRediming earnings from Employee 1 ..."
 echo "**********************************************************"
 stellar contract invoke \
-    --id practice \
+    --id lance \
     --source lancer-employee-1 \
     --network testnet \
     -- redeem \
@@ -110,6 +111,6 @@ stellar contract invoke \
 # echo -e "\tOpening contract on Steller Expert explorer"
 # echo "******************************************************"
 
-# CONTRACT_ID=$(stellar contract alias show practice)
+# CONTRACT_ID=$(stellar contract alias show lance)
 # EXPLORER_URL="https://stellar.expert/explorer/testnet/contract/$CONTRACT_ID"
 # xdg-open "$EXPLORER_URL"

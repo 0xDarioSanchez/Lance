@@ -2,7 +2,7 @@ use soroban_sdk::{Address, Env};
 
 use super::{
     admin::{has_admin, set_admin},
-    blend::set_blend_pool,
+    // bend::set_blend_pool,
     token::set_token,
 };
 use crate::storage::error::Error;
@@ -19,7 +19,7 @@ pub fn initialize(
 
     set_admin(&env, &admin);
     set_token(&env, &token);
-    set_blend_pool(&env, &blend_pool);
+    // set_blend_pool(&env, &blend_pool);
 
     // events::contract::contract_initialized(&env, &admin); //TODO
 

@@ -3,3 +3,4 @@ pub mod exployee;
 pub mod milestone;
 pub mod service;
 pub mod user;
+pub mod blend;

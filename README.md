@@ -70,6 +70,11 @@ Execute run.sh only once runningto build, optimize and execute transations
 ```bash
 ./run.sh
 ```
+
+### Front-End
+
+https://lancestellar.vercel.app/
+
 ### Tests
 
 For running test execute
@@ -82,7 +87,7 @@ cargo test
 - **Access Control**: Only admin and authorized crowdfunding contract can mint
 - **Proof Uniqueness**: Prevents duplicate NFTs for the same proof
 - **Validation System**: Two-step process (creation + validation)
-- **Immutable Records**: NFT metadata provides permanent milestone records
+- **Immutable Records**: Saved metadata provides permanent milestone records
 
 ## Testing
 
@@ -102,11 +107,13 @@ Key test scenarios:
 ## Roadmap
 
 - [x] Develop MVP with main functionalities 
+- [x] Soroban Smart Contracts for users, services, disputes and voting interactions
 - [x] Develop basic front-end to showcase user interactions 
-- [x] Blend functions for deposit funds and generate yield
+- [x] Functions and test for deposit funds and withdrow earnings with Blend Capital
+- [x] Implement an on-chain reputation system based in Neural Quorum Governance
+- [x] Wallet integration with Stellar Wallet Key
 
 - [ ] Evaluate and implement a minimal contract balance to assure liquidity for instant user payments
-- [ ] Implement an on-chain reputation system
 - [ ] Create registry platform for user verification, offering an optional 'checked' status
 - [ ] Create a matching page where users can search and chat before before agreeing to a service
 - [ ] Implement premium client tools like talent matching, project management features, or hiring support

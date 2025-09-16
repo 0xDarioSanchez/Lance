@@ -1,5 +1,5 @@
 use soroban_sdk::{Address, Env, String, Vec};
-use crate::storage::{dispute::{get_dispute, set_dispute, Dispute}, dispute_status::DisputeStatus, error::Error, service::*, service_status::ServiceStatus, storage::DataKey
+use crate::storage::{dispute::{get_dispute, set_dispute, Dispute}, dispute_status::DisputeStatus, error::Error, service::*, service_status::ServiceStatus, storage::DataKey, user::get_user
 };
 
 pub fn create_dispute(
@@ -52,7 +52,6 @@ pub fn create_dispute(
     Ok(dispute)
 }
 
-
 pub fn update_dispute(
     env: &Env,
     dispute_id: u32,
@@ -70,6 +69,38 @@ pub fn update_dispute(
 
     dispute.employee_proves = core::prelude::v1::Some(proof);
 
+    set_dispute(env, dispute_id, dispute.clone());
+
+    //TODO add event
+
+    Ok(dispute)
+}
+
+pub fn voter_registration(
+    env: &Env,
+    creator: Address,
+    dispute_id: u32,
+) -> Result<Dispute, Error> {
+    creator.require_auth();
+
+    let new_judge_caller = get_user(env, creator.clone())?;
+
+    if !new_judge_caller.is_judge {
+        return Err(Error::NotAuthorized);
+    }
+    
+    let mut dispute = get_dispute(env, dispute_id)?;
+    
+    if dispute.dispute_status != DisputeStatus::OPEN {
+        return Err(Error::InvalidDisputeStatus);
+    }   
+    
+    if creator == dispute.employee || creator == dispute.employer {
+        return Err(Error::NotAuthorized);
+    }   
+    
+    // TODO: Validate if user already exist
+    dispute.jury_members.push_back(creator);
     set_dispute(env, dispute_id, dispute.clone());
 
     //TODO add event

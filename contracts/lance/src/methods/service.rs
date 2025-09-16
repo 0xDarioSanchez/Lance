@@ -2,6 +2,7 @@ use soroban_sdk::{Address, Env, String};
 
 use crate::methods::balance::*;
 use crate::storage::{constants::*, error::Error, service::*, service_status::ServiceStatus};
+use crate::events::event::created_service;
 
 use crate::methods::token::token_transfer;
 
@@ -39,8 +40,7 @@ pub fn create_service(
 
     set_service(env, id, service.clone());
 
-    //TODO add event
-
+    created_service(env, &creator, &id);
     Ok(service)
 }
 
@@ -70,8 +70,6 @@ pub fn accept_service(env: &Env, employer: Address, id: u32) -> Result<Service, 
     service.status = ServiceStatus::ACCEPTED;
 
     set_service(env, id, service.clone());
-
-    //TODO add event
 
     Ok(service)
 }
@@ -105,8 +103,6 @@ pub fn approve_milestone(env: &Env, employer: Address, id: u32) -> Result<Servic
 
     set_service(env, id, service.clone());
 
-    //TODO add event
-
     Ok(service)
 }
 
@@ -134,8 +130,6 @@ pub fn approve_service(env: &Env, employer: Address, id: u32) -> Result<Service,
     );
 
     remove_service(env, id);
-
-    //TODO add event
 
     Ok(service)
 }
@@ -197,19 +191,6 @@ pub fn redeem(env: &Env, employee: Address) -> Result<i128, Error> {
     Ok(balance)
 }
 
-//TODO add convertion
-// pub fn convert_and_redeem(
-//     env: &Env,
-//     employee: Address,
-//     conversion_rate: i128
-// ) -> Result<i128, Error> {
-//     employee.require_auth();
-
-//     let balance = get_balance(env, &employee);
-
-//     if balance == 0 {
-//         return Err(Error::BalanceIsZero);
-//     }
 
 //     let converted_amount = balance * conversion_rate;
 

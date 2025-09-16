@@ -6,6 +6,7 @@ use crate::{ storage::{
     service_status::ServiceStatus,
     storage::DataKey,
 }};
+use crate::events::event::created_dispute;
 use soroban_sdk::{Address, Env, String, Vec};
 
 pub fn create_dispute(
@@ -59,8 +60,8 @@ pub fn create_dispute(
     set_service(env, service_id, service.clone());
     set_dispute(env, dispute_id, dispute.clone());
 
-    //TODO add event
-
+    created_dispute(&env, &creator, &service_id);
+    
     Ok(dispute)
 }
 
@@ -77,8 +78,6 @@ pub fn update_dispute(env: &Env, dispute_id: u32, proof: String) -> Result<Dispu
     dispute.employee_proves = core::prelude::v1::Some(proof);
 
     set_dispute(env, dispute_id, dispute.clone());
-
-    //TODO add event
 
     Ok(dispute)
 }

@@ -36,7 +36,6 @@ pub fn voter_registration(env: &Env, creator: Address, dispute_id: u32) -> Resul
     dispute.jury_members.push_back(creator);
     set_dispute(env, dispute_id, dispute.clone());
 
-    //TODO add event
 
     Ok(dispute)
 }
@@ -83,8 +82,6 @@ pub fn vote(env: &Env, creator: Address, dispute_id: u32, vote: Vote) -> Result<
     }
 
     set_dispute(env, dispute_id, dispute.clone());
-
-    //TODO add event
 
     Ok(dispute)
 }

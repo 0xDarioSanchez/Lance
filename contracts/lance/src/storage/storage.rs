@@ -5,6 +5,7 @@ use soroban_sdk::{contracttype, Address};
 pub enum DataKey {
     Admin,
     Token,
+    BlendPool,
     Users(Address),
     Services(u32),
     Disputes(u32),

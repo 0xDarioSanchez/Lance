@@ -73,7 +73,11 @@ Execute run.sh only once runningto build, optimize and execute transations
 
 ### Front-End
 
+To see our page:
 https://lancestellar.vercel.app/
+
+To open our front-end and wallet integration code
+https://github.com/artugrande/lance-front/
 
 ### Tests
 

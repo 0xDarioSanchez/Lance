@@ -1,4 +1,4 @@
-use crate::{methods::balance::{self, get_balance, set_balance}, storage::{
+use crate::{methods::balance::{get_balance, set_balance}, storage::{
     dispute::{get_dispute, set_dispute, Dispute},
     dispute_status::DisputeStatus,
     error::Error,
@@ -9,6 +9,8 @@ use crate::{methods::balance::{self, get_balance, set_balance}, storage::{
     vote::Vote,
 }};
 use soroban_sdk::{Address, Env, String, Vec};
+
+ const MIN_VOTES_TO_FINISH_DISPUTE: u32 = 5;
 
 pub fn create_dispute(
     env: &Env,
@@ -128,7 +130,7 @@ pub fn vote(env: &Env, creator: Address, dispute_id: u32, vote: Vote) -> Result<
 
     // TODO: Validate if vote already exist
     dispute.votes.push_back(vote);
-    if dispute.votes.len() == 5 {
+    if dispute.votes.len() == MIN_VOTES_TO_FINISH_DISPUTE {
         dispute.dispute_status = DisputeStatus::EXECUTED;
         dispute.finish_timestamp = Some(env.ledger().timestamp());
 

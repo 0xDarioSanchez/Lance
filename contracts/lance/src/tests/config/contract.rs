@@ -24,6 +24,8 @@ impl<'a> ContractTest<'a> {
         let employee_1 = Address::generate(&env);
         let employer_1 = Address::generate(&env);
 
+        let blend_pool = Address::generate(&env);
+
         let (token_client, token_admin) = create_token_contract(&env, &token_issuer);
 
         token_admin
@@ -33,7 +35,7 @@ impl<'a> ContractTest<'a> {
             .mock_all_auths()
             .mint(&employer_1, &BASE_MINT_AMOUNT);
 
-        let contract_id = env.register(Contract, (&admin, &token_admin.address));
+        let contract_id = env.register(Contract, (&admin, &token_admin.address, &blend_pool));
         let contract = ContractClient::new(&env, &contract_id);
 
         ContractTest {

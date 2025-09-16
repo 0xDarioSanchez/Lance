@@ -17,7 +17,7 @@ use crate::methods::{
 };
 
 pub trait ContractTrait {
-    fn __constructor(env: Env, admin: Address, token: Address) -> Result<(), Error>; // Keep as is
+    fn __constructor(env: Env, admin: Address, token: Address, blend_pool: Address) -> Result<(), Error>; // Keep as is
 
     fn new_user(
         env: Env,
@@ -90,8 +90,8 @@ pub struct Contract;
 
 #[contractimpl]
 impl ContractTrait for Contract {
-    fn __constructor(env: Env, admin: Address, token: Address) -> Result<(), Error> {
-        initialize(&env, admin, token)
+    fn __constructor(env: Env, admin: Address, token: Address, blend_pool: Address) -> Result<(), Error> {
+        initialize(&env, admin, token, blend_pool)
     }
 
     fn new_user(
@@ -176,6 +176,7 @@ impl ContractTrait for Contract {
         redeem(env, employee)   
     }
 
+    // Register as a voter for a dispute, can be called by any judge.
     fn voter_registration(
         env: &Env, 
         creator: Address, 

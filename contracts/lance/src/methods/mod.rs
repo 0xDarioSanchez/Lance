@@ -1,9 +1,9 @@
 pub mod admin;
 pub mod balance;
+pub mod blend;
 pub mod dispute;
 pub mod initialize;
 pub mod service;
 pub mod token;
 pub mod user;
 pub mod vote;
-pub mod blend_calls;

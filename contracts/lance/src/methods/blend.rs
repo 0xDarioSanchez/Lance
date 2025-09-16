@@ -1,10 +1,29 @@
-use soroban_sdk::{Address, Env};
+use soroban_sdk::{token, Address, Env};
 
 use crate::methods::balance::*;
-use crate::storage::{constants::*, error::Error, service::*, service_status::ServiceStatus};
+use crate::storage::{
+    constants::*, error::Error, service::*, service_status::ServiceStatus, storage::DataKey,
+};
 
 use crate::methods::token::token_transfer;
 
+const TOKEN: DataKey = DataKey::Token;
+const BLEND_POOL: DataKey = DataKey::BlendPool;
+
+pub(crate) fn set_blend_pool(env: &Env, blend_pool: &Address) {
+    let key = DataKey::BlendPool;
+
+    env.storage().instance().set(&key, blend_pool);
+}
+
+pub(crate) fn get_blend_pool(env: &Env) -> Result<Address, Error> {
+    let key = DataKey::BlendPool;
+
+    env.storage()
+        .instance()
+        .get(&key)
+        .ok_or(Error::ContractNotInitialized)
+}
 
 pub fn lend_to_blend(env: Env) -> i128 {
     let token_address: Address = env.storage().instance().get(&TOKEN).unwrap();
@@ -16,7 +35,8 @@ pub fn lend_to_blend(env: Env) -> i128 {
     // Get current contract balance
     let contract_balance = token.balance(&env.current_contract_address());
 
-    if contract_balance <= 0 {      //TODO implement a minimal contract balance to assure liquidity for instant user payments
+    if contract_balance <= 0 {
+        //TODO implement a minimal contract balance to assure liquidity for instant user payments
         panic_with_error!(&env, &EscrowError::NoTokensToLend);
     }
 
@@ -30,7 +50,8 @@ pub fn lend_to_blend(env: Env) -> i128 {
                     env.current_contract_address(),
                     blend_pool_address.clone(),
                     contract_balance,
-                ).into_val(&env),
+                )
+                    .into_val(&env),
             },
             sub_invocations: vec![&env],
         }),
@@ -48,21 +69,22 @@ pub fn lend_to_blend(env: Env) -> i128 {
         &env.current_contract_address(), // from (this contract)
         &env.current_contract_address(), // spender (this contract)
         &env.current_contract_address(), // to (bTokens recipient - this contract)
-        &requests
+        &requests,
     );
 
     // Emit lending event
     env.events().publish(
-        (Symbol::new(&env, "lent_to_blend"), env.current_contract_address()),
-        contract_balance
+        (
+            Symbol::new(&env, "lent_to_blend"),
+            env.current_contract_address(),
+        ),
+        contract_balance,
     );
 
     contract_balance
 }
 
-
 pub fn withdraw_from_blend(env: Env) -> i128 {
-
     let token_address: Address = env.storage().instance().get(&TOKEN).unwrap();
     let blend_pool_address: Address = env.storage().instance().get(&BLEND_POOL).unwrap();
 
@@ -90,18 +112,20 @@ pub fn withdraw_from_blend(env: Env) -> i128 {
         &env.current_contract_address(), // from (this contract)
         &env.current_contract_address(), // spender (this contract)
         &env.current_contract_address(), // to (withdrawal recipient - this contract)
-        &requests
+        &requests,
     );
 
     // Emit withdrawal event
     env.events().publish(
-        (Symbol::new(&env, "withdrawn_from_blend"), env.current_contract_address()),
-        total_supply
+        (
+            Symbol::new(&env, "withdrawn_from_blend"),
+            env.current_contract_address(),
+        ),
+        total_supply,
     );
 
     total_supply
 }
-
 
 pub fn withdraw_amount_from_blend(env: Env, amount: i128) -> i128 {
     if amount <= 0 {
@@ -139,13 +163,16 @@ pub fn withdraw_amount_from_blend(env: Env, amount: i128) -> i128 {
         &env.current_contract_address(), // from (this contract)
         &env.current_contract_address(), // spender (this contract)
         &env.current_contract_address(), // to (withdrawal recipient - this contract)
-        &requests
+        &requests,
     );
 
     // Emit withdrawal event
     env.events().publish(
-        (Symbol::new(&env, "withdrawn_amount_from_blend"), env.current_contract_address()),
-        amount
+        (
+            Symbol::new(&env, "withdrawn_amount_from_blend"),
+            env.current_contract_address(),
+        ),
+        amount,
     );
 
     amount

@@ -17,4 +17,5 @@ pub enum Error {
     InvalidService = 10,
     InvalidServiceStatus = 11,
     DisputeAlreadyCreated = 12,
+    InvalidDisputeStatus = 13,
 }

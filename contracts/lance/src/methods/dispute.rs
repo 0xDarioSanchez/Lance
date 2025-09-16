@@ -1,7 +1,5 @@
 use soroban_sdk::{Address, Env, String, Vec};
-use crate::storage::{error::Error, dispute::Dispute, service::*,
-    dispute_status::DisputeStatus, storage::DataKey, service_status::ServiceStatus,
-    dispute::set_dispute
+use crate::storage::{dispute::{get_dispute, set_dispute, Dispute}, dispute_status::DisputeStatus, error::Error, service::*, service_status::ServiceStatus, storage::DataKey
 };
 
 pub fn create_dispute(
@@ -12,11 +10,11 @@ pub fn create_dispute(
 ) -> Result<Dispute, Error> {
     creator.require_auth();
 
-    let service = get_service(env, service_id)?;
-    let employee = service.employee;
-    let employer = service.employer;
+    let mut service = get_service(env, service_id)?;
+    let employee = service.employee.clone();
+    let employer = service.employer.clone();
 
-    if creator != employee && creator != employer {
+    if creator != employer {
         return Err(Error::NotAuthorized);
     }   
     if service.status != ServiceStatus::ACCEPTED {
@@ -44,6 +42,33 @@ pub fn create_dispute(
         employer_proves: proof,
         payment: service.milestone_payment,
     };
+
+    service.status = ServiceStatus::DISPUTING;
+    set_service(env, service_id, service.clone());
+    set_dispute(env, dispute_id, dispute.clone());
+
+    //TODO add event
+
+    Ok(dispute)
+}
+
+
+pub fn update_dispute(
+    env: &Env,
+    dispute_id: u32,
+    proof: String
+) -> Result<Dispute, Error> {
+    
+    let mut dispute = get_dispute(env, dispute_id)?;
+    let employee = dispute.employee.clone();
+
+    employee.require_auth();
+    
+    if dispute.dispute_status != DisputeStatus::OPEN {
+        return Err(Error::InvalidDisputeStatus);
+    }   
+
+    dispute.employee_proves = core::prelude::v1::Some(proof);
 
     set_dispute(env, dispute_id, dispute.clone());
 

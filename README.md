@@ -130,8 +130,13 @@ Key test scenarios:
 
 ## Screenshots
 
+### Front-End
 ![frontend](images/frontend.png "Front-End")
+### Running script 1
 ![script](images/script1.png "Running script 1")
+### Running script 2
 ![script](images/script2.png "Running script 2")
+### Public Functions
 ![public_functions](images/public_functions.png "Public Functions")
+### Transactions
 ![transactions](images/transactions.png "Transactions")

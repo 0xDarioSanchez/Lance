@@ -130,8 +130,8 @@ Key test scenarios:
 
 ## Screenshots
 
-![frontend](images/frontend.jpg "Front-End")
-![script](images/script1.jpg "Running script 1")
-![script](images/script2.jpg "Running script 2")
-![public_functions](images/public_functions.jpg "Public Functions")
-![transactions](images/transactions.jpg "Transactions")
+![frontend](images/frontend.png "Front-End")
+![script](images/script1.png "Running script 1")
+![script](images/script2.png "Running script 2")
+![public_functions](images/public_functions.png "Public Functions")
+![transactions](images/transactions.png "Transactions")

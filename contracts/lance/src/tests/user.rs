@@ -1,8 +1,8 @@
 #![cfg(test)]
 
 use crate::tests::config::contract::ContractTest;
-use soroban_sdk::{Address, Env, String};
 use soroban_sdk::testutils::Address as TestAddress;
+use soroban_sdk::{Address, Env, String};
 // use soroban_sdk::testutils::Env as TestEnv; // if you need mock_all_auths
 
 #[test]
@@ -27,19 +27,20 @@ fn test_create_employee_user() {
 
 #[test]
 fn test_create_employer_user() {
-    let mut contract_test = ContractTest::setup();
-    let env = &mut contract_test.env;
-    let contract = &contract_test.contract;
+    let ContractTest {
+        env,
+        contract,
+        employer_1,
+        ..
+    } = ContractTest::setup();
 
     env.mock_all_auths();
 
-    let employer: Address = <TestAddress as AddressTrait>::generate(&env);
+    contract.new_user(&employer_1, &false, &true, &false, &None);
 
-    contract.new_user(&employer, &false, &true, &false, &None);
+    let user_data = contract.get_user(&employer_1);
 
-    let user_data = contract.get_user(&employer);
-
-    assert_eq!(user_data.address, employer);
+    assert_eq!(user_data.address, employer_1);
     assert!(!user_data.is_employee);
     assert!(user_data.is_employer);
     assert!(!user_data.is_judge);
@@ -48,37 +49,46 @@ fn test_create_employer_user() {
 
 #[test]
 fn test_create_user_with_personal_data() {
-    let mut contract_test = ContractTest::setup();
-    let env = &mut contract_test.env;
-    let contract = &contract_test.contract;
+    let ContractTest {
+        env,
+        contract,
+        employee_1,
+        ..
+    } = ContractTest::setup();
 
     env.mock_all_auths();
 
-    let user: Address = TestAddress::generate(&env);
-    let personal_data = String::from_str(env, "Employee 1");
+    let personal_data = String::from_str(&env, "Employee 1");
 
-    contract.new_user(&user, &true, &false, &false, &Some(personal_data.clone()));
+    contract.new_user(
+        &employee_1,
+        &true,
+        &false,
+        &false,
+        &Some(personal_data.clone()),
+    );
 
-    let user_data = contract.get_user(&user);
+    let user_data = contract.get_user(&employee_1);
     assert_eq!(user_data.personal_data, Some(personal_data));
 }
 
 #[test]
 fn test_multiple_users_are_independent() {
-    let mut contract_test = ContractTest::setup();
-    let env = &mut contract_test.env;
-    let contract = &contract_test.contract;
+    let ContractTest {
+        env,
+        contract,
+        employee_1,
+        employer_1,
+        ..
+    } = ContractTest::setup();
 
     env.mock_all_auths();
 
-    let user1: Address = TestAddress::generate(&env);
-    let user2: Address = TestAddress::generate(&env);
+    contract.new_user(&employee_1, &true, &false, &false, &None);
+    contract.new_user(&employer_1, &false, &true, &false, &None);
 
-    contract.new_user(&user1, &true, &false, &false, &None);
-    contract.new_user(&user2, &false, &true, &false, &None);
-
-    let data1 = contract.get_user(&user1);
-    let data2 = contract.get_user(&user2);
+    let data1 = contract.get_user(&employee_1);
+    let data2 = contract.get_user(&employer_1);
 
     assert_ne!(data1.address, data2.address);
     assert!(data1.is_employee && !data2.is_employee);

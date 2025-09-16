@@ -4,7 +4,8 @@ mod contract;
 mod events;
 mod methods;
 mod storage;
-// mod tests;
+#[cfg(test)]
+mod tests;
 mod utils;
 
 pub use crate::contract::Contract;

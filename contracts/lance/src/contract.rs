@@ -5,6 +5,7 @@ use crate::methods::{
     balance::*,
     vote::*,
 };
+use crate::storage::vote::Vote;
 use crate::storage::{
     error::Error,
     user::*,
@@ -83,6 +84,12 @@ pub trait ContractTrait {
         env: &Env, 
         creator: Address, 
         dispute_id: u32) -> Result<Dispute, Error>;
+
+    fn vote(
+        env: &Env, 
+        creator: Address, 
+        dispute_id: u32, 
+        vote: Vote) -> Result<Dispute, Error>;
 }
 
 #[contract]
@@ -183,4 +190,13 @@ impl ContractTrait for Contract {
         dispute_id: u32) -> Result<Dispute, Error> {
         voter_registration(env, creator, dispute_id)
     }
+
+    // Cast a vote for a dispute, can be called by any registered voter.
+    fn vote(
+        env: &Env, 
+        creator: Address, 
+        dispute_id: u32, 
+        user_vote: Vote) -> Result<Dispute, Error> {
+        vote(env, creator, dispute_id, user_vote)
+    } 
 }

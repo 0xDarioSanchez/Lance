@@ -3,6 +3,7 @@ use crate::methods::{
     dispute::*,
     service::*,
     balance::*,
+    vote::*,
 };
 use crate::storage::{
     error::Error,
@@ -76,7 +77,12 @@ pub trait ContractTrait {
     fn redeem(
         env: &Env,
         employee: Address,
-   ) -> Result<i128, Error> ;
+    ) -> Result<i128, Error>;
+
+    fn voter_registration(
+        env: &Env, 
+        creator: Address, 
+        dispute_id: u32) -> Result<Dispute, Error>;
 }
 
 #[contract]
@@ -168,5 +174,12 @@ impl ContractTrait for Contract {
         employee: Address,
     ) -> Result<i128, Error> {
         redeem(env, employee)   
+    }
+
+    fn voter_registration(
+        env: &Env, 
+        creator: Address, 
+        dispute_id: u32) -> Result<Dispute, Error> {
+        voter_registration(env, creator, dispute_id)
     }
 }

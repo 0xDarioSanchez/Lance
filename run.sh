@@ -111,6 +111,6 @@ stellar contract invoke \
 # echo -e "\tOpening contract on Steller Expert explorer"
 # echo "******************************************************"
 
-# CONTRACT_ID=$(stellar contract alias show lance)
-# EXPLORER_URL="https://stellar.expert/explorer/testnet/contract/$CONTRACT_ID"
-# xdg-open "$EXPLORER_URL"
+CONTRACT_ID=$(stellar contract alias show lance)
+EXPLORER_URL="https://stellar.expert/explorer/testnet/contract/$CONTRACT_ID"
+xdg-open "$EXPLORER_URL"

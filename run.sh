@@ -11,11 +11,11 @@ echo -e "\t****Deploying**** ..."
 echo "**********************************"
 stellar contract deploy \
   --wasm target/wasm32v1-none/release/lance.optimized.wasm \
-  --source-account lancer-admin \
+  --source-account lance-admin \
   --network testnet \
   --alias lance \
   -- \
-  --admin lancer-admin \
+  --admin lance-admin \
   --token CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC \
   --blend-pool CD6SJIRPOSP5NC73ZWJ36WT3PS34M6YUMOVDALMAR74IKXWGMX5VMEAG
 # CD6SJIRPOSP5NC73ZWJ36WT3PS34M6YUMOVDALMAR74IKXWGMX5VMEAG
@@ -25,10 +25,10 @@ echo -e "\tRegistration of Employee 1 ..."
 echo "***********************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employee-1 \
+    --source lance-employee-1 \
     --network testnet \
     -- new_user \
-    --user lancer-employee-1 \
+    --user lance-employee-1 \
     --is_employer false \
     --is_employee true \
     --is_judge false \
@@ -39,20 +39,20 @@ echo -e "\tGet Employee 1 ..."
 echo "*****************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employee-1 \
+    --source lance-employee-1 \
     --network testnet \
     -- get_user \
-    --user lancer-employee-1
+    --user lance-employee-1
 
 echo "**************************************"
 echo -e "\tRegistration Employer 1 ..."
 echo "**************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employer-1 \
+    --source lance-employer-1 \
     --network testnet \
     -- new_user \
-    --user lancer-employee-1 \
+    --user lance-employee-1 \
     --is_employer true \
     --is_employee false \
     --is_judge false \
@@ -63,11 +63,11 @@ echo -e "\tCreation Service 1 from Employer 1 ..."
 echo "**************************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employee-1 \
+    --source lance-employee-1 \
     --network testnet \
     -- create_service \
-    --creator lancer-employee-1 \
-    --employer lancer-employer-1 \
+    --creator lance-employee-1 \
+    --employer lance-employer-1 \
     --id 1 \
     --duration 1 \
     --metadata null \
@@ -78,10 +78,10 @@ echo -e "\tAccepting Service 1 from Employer 1 ..."
 echo "**************************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employer-1 \
+    --source lance-employer-1 \
     --network testnet \
     -- accept_service \
-    --employer lancer-employer-1 \
+    --employer lance-employer-1 \
     --id 1
 
 echo "*******************************************************************"
@@ -89,10 +89,10 @@ echo -e "\tApproving milestione for Service 1 from Employer 1 ..."
 echo "*******************************************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employer-1 \
+    --source lance-employer-1 \
     --network testnet \
     -- approve_service \
-    --employer lancer-employer-1 \
+    --employer lance-employer-1 \
     --id 1
 
 
@@ -101,10 +101,10 @@ echo -e "\tRediming earnings from Employee 1 ..."
 echo "**********************************************************"
 stellar contract invoke \
     --id lance \
-    --source lancer-employee-1 \
+    --source lance-employee-1 \
     --network testnet \
     -- redeem \
-    --employee lancer-employee-1
+    --employee lance-employee-1
 
 
 # echo "******************************************************"

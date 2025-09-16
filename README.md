@@ -103,7 +103,7 @@ Key test scenarios:
 
 - [x] Develop MVP with main functionalities 
 - [x] Develop basic front-end to showcase user interactions 
-- [x] Blend integration for deposit funds and generate yield
+- [x] Blend functions for deposit funds and generate yield
 
 - [ ] Evaluate and implement a minimal contract balance to assure liquidity for instant user payments
 - [ ] Implement an on-chain reputation system
